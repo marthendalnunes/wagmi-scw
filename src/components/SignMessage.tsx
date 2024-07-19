@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Hex } from "viem";
+import { parseErc6492Signature } from "viem/experimental";
 import { useAccount, usePublicClient, useSignMessage } from "wagmi";
 import { SiweMessage } from "siwe";
 
@@ -27,6 +28,7 @@ export function SignMessage() {
   const checkValid = useCallback(async () => {
     if (!signature || !account.address || !client) return;
 
+
     client
       .verifyMessage({
         address: account.address,
@@ -38,6 +40,11 @@ export function SignMessage() {
 
   useEffect(() => {
     checkValid();
+    if (!signature) return
+
+    const parsedSignature = parseErc6492Signature(signature);
+    console.log({ parsedSignature })
+
   }, [signature, account]);
 
   return (
@@ -48,7 +55,7 @@ export function SignMessage() {
       >
         Sign
       </button>
-      <p>{}</p>
+      <p>{ }</p>
       {signature && <p>Signature: {signature}</p>}
       {valid != undefined && <p> Is valid: {valid.toString()} </p>}
     </div>
